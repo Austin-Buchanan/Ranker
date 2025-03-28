@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Books>
+  <Template>
+    <Part>Title</Part>
+    <Part>Author</Part>
+  </Template>
+  <Book>
+    <Title>Blood Meridian</Title>
+    <Author>Cormac McCarthy</Author>
+    <ELO>1082</ELO>
+  </Book>
+  <Book>
+    <Title>Tender is the Night</Title>
+    <Author>F. Scott Fitzgerald</Author>
+    <ELO>1001</ELO>
+  </Book>
+  <Book>
+    <Title>Suttree</Title>
+    <Author>Cormac McCarthy</Author>
+    <ELO>917</ELO>
+  </Book>
+</Books>

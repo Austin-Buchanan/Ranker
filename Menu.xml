@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Menu>
+  <MainMenu>
+    <Option>Books</Option>
+    <Option>Movies</Option>
+    <Option>Games</Option>
+    <Option>Songs</Option>
+    <Option>Quit</Option>
+  </MainMenu>
+  <ActionMenu>
+    <Option>Add</Option>
+    <Option>View</Option>
+    <Option>Rank</Option>
+    <Option>Quit</Option>
+  </ActionMenu>
+</Menu>
