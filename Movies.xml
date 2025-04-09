@@ -4,14 +4,4 @@
     <Part>Title</Part>
     <Part>Year</Part>
   </Template>
-  <Movie>
-    <Title>The Sound of Music</Title>
-    <Year>1965</Year>
-    <ELO>1000</ELO>
-  </Movie>
-  <Movie>
-    <Title>Brooklyn</Title>
-    <Year>2015</Year>
-    <ELO>1000</ELO>
-  </Movie>
 </Movies>

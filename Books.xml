@@ -4,24 +4,4 @@
     <Part>Title</Part>
     <Part>Author</Part>
   </Template>
-  <Book>
-    <Title>Blood Meridian</Title>
-    <Author>Cormac McCarthy</Author>
-    <ELO>1082</ELO>
-  </Book>
-  <Book>
-    <Title>Tender is the Night</Title>
-    <Author>F. Scott Fitzgerald</Author>
-    <ELO>1001</ELO>
-  </Book>
-  <Book>
-    <Title>Suttree</Title>
-    <Author>Cormac McCarthy</Author>
-    <ELO>917</ELO>
-  </Book>
-  <Book>
-    <Title>Intermezzo</Title>
-    <Author>Sally Rooney</Author>
-    <ELO>1000</ELO>
-  </Book>
 </Books>
