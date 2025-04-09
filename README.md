@@ -7,6 +7,7 @@ Then you can add new items of that media type, view the items of that media type
 Items are stored in XML files for the associated media type. 
 
 ## Adding Items
+
 When adding items, you will be prompted for different data to identify the item. 
 For example, when adding a book, you will be prompted to provide a title and author. 
 
@@ -18,6 +19,7 @@ When viewing items, you will be asked if you want to view items in ascending or 
 The application uses the ELO score assigned to each item for this ranking. 
 
 ## Ranking Items
+
 When ranking items, the application will randomly select two items of the selected media type. 
 You will be asked which item you prefer. 
 After selecting an item, the application will use [ELO calculations](https://en.wikipedia.org/wiki/Elo_rating_system) to update the ELO ranking for each item. 
