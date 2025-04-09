@@ -19,4 +19,9 @@
     <Author>Cormac McCarthy</Author>
     <ELO>917</ELO>
   </Book>
+  <Book>
+    <Title>Intermezzo</Title>
+    <Author>Sally Rooney</Author>
+    <ELO>1000</ELO>
+  </Book>
 </Books>

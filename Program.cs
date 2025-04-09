@@ -1,8 +1,10 @@
 ﻿// Present main menu, loading ActionMenu based on user selection
+using Ranker;
 using System.Xml;
 
 string mainOption = "";
-List<string> mainOptions = QuickReadXML("Menu.xml", "MainMenu");
+XmlInterface menuXml = new("Menu.xml");
+List<string> mainOptions = menuXml.QuickReadXml("MainMenu");
 while (mainOption != "Quit")
 {
     mainOption = SelectOption(mainOptions, "Welcome to Ranker! What media would you like to use?");
@@ -10,46 +12,29 @@ while (mainOption != "Quit")
     RunActionMenu(mainOption);
 }
 
-static void RunActionMenu(string mediaType)
+void RunActionMenu(string mediaType)
 {
+    XmlInterface mediaXml = new($"{mediaType}.xml");
     string actionOption = "";
-    List<string> actionOptions = QuickReadXML("Menu.xml", "ActionMenu");
+    List<string> actionOptions = menuXml.QuickReadXml("ActionMenu");
     while (actionOption != "Quit")
     {
         actionOption = SelectOption(actionOptions, $"You're working with {mediaType}. What would you like to do?");
         switch (actionOption)
         {
             case "Add":
-                AddItems(mediaType);
+                AddItems(mediaXml, mediaType);
                 break;
             case "View":
-                ViewItems(mediaType);
+                ViewItems(mediaXml);
                 break;
             case "Rank":
-                RankItems(mediaType, 64);
+                RankItems(mediaXml, mediaType, 64);
                 break;
             case "Quit":
                 break;
         }
     }
-}
-
-static List<string> QuickReadXML(string xmlName, string nodeName)
-{
-    List<string> result = [];
-    XmlDocument doc = new();
-    doc.Load($"../../../{xmlName}");
-    XmlElement? root = doc.DocumentElement;
-    if (root == null) { return result; }
-    foreach (XmlNode node in root.ChildNodes)
-    {
-        if (node.Name == nodeName)
-        {
-            foreach (XmlNode subNode in node.ChildNodes) { result.Add(subNode.InnerText); }
-            break;
-        }
-    }
-    return result;
 }
 
 static string SelectOption(List<string> options, string header)
@@ -92,26 +77,21 @@ static string SelectOption(List<string> options, string header)
     return options[currentIndex];
 }
 
-static void AddItems(string mediaType)
+static void AddItems(XmlInterface mediaXml, string mediaType)
 {
-    XmlDocument doc = new();
-    List<string> templateParts = QuickReadXML($"{mediaType}.xml", "Template");
+    List<string> templateParts = mediaXml.QuickReadXml("Template");
     List<string> itemParts = [];
     string? userInput;
     bool doneAdding = false;
     bool itemPresent;
     XmlElement itemElement;
     XmlElement subElement;
-    XmlElement? root;
     XmlElement itemELO;
 
     while (!doneAdding)
     {
-        doc.Load($"../../../{mediaType}.xml");
-        root = doc.DocumentElement;
-        if (root == null) { return; }
-        itemELO = doc.CreateElement("ELO");
-        itemELO.InnerText = "1000";
+        mediaXml.Refresh();
+        itemELO = mediaXml.CreateElement("ELO", "1000"); 
 
         do
         {
@@ -126,20 +106,19 @@ static void AddItems(string mediaType)
                 } while (userInput == null || userInput.Length == 0);
                 itemParts.Add(userInput);
             }
-            itemPresent = IsItemPresent(itemParts, root, mediaType[..^1]);
+            itemPresent = mediaXml.IsItemPresent(itemParts, mediaType[..^1]);
             if (itemPresent) { Console.WriteLine("The entered values are already present in the system. Please enter values for a new item."); }
         } while (itemPresent);
 
-        itemElement = doc.CreateElement(mediaType[..^1]);
+        itemElement = mediaXml.CreateElement(mediaType[..^1]);
         for (int i = 0; i < itemParts.Count; i++)
         {
-            subElement = doc.CreateElement(templateParts[i]);
-            subElement.InnerText = itemParts[i];
+            subElement = mediaXml.CreateElement(templateParts[i], itemParts[i]);
             itemElement.AppendChild(subElement);
         }
         itemElement.AppendChild(itemELO);
-        root.AppendChild(itemElement);
-        doc.Save($"../../../{mediaType}.xml");
+        mediaXml.AttachToRoot(itemElement);
+        mediaXml.Refresh();
 
         bool validInput = false;
         string? continueInput;
@@ -163,43 +142,11 @@ static void AddItems(string mediaType)
     }
 }
 
-static bool IsItemPresent(List<string> itemParts, XmlElement root, string nodeName)
+static void ViewItems(XmlInterface mediaXml)
 {
-    List<string> compItemParts = [];
-    foreach (XmlNode node in root.ChildNodes)
-    {
-        if (compItemParts.Count > 0) { compItemParts.Clear(); }
-        if (node.Name == nodeName)
-        {
-            foreach (XmlNode subNode in node.ChildNodes)
-            {
-                if (subNode.Name != "ELO") { compItemParts.Add(subNode.InnerText); }
-            }
-            for (int i = 0; i < itemParts.Count; i++)
-            {
-                if (itemParts[i] != compItemParts[i]) { break; }
-                else if (i == itemParts.Count - 1) { return true; }
-            }
-        }
-    }
-    return false;
-}
+    List<XmlNode> itemNodeList = mediaXml.GetNonTemplateNodes();
 
-static void ViewItems(string mediaType)
-{
-    XmlDocument doc = new();
-    doc.Load($"../../../{mediaType}.xml");
-    List<XmlNode> itemNodeList = [];
     Dictionary<int, int> eloDict = [];
-    string itemText;
-
-    XmlElement? root = doc.DocumentElement;
-    if (root == null) { return; }
-    foreach (XmlNode node in root.ChildNodes)
-    {
-        if (node.Name != "Template") { itemNodeList.Add(node); }
-    }
-
     for (int i = 0; i < itemNodeList.Count; i++)
     {
         eloDict.Add(i, GetElo(itemNodeList[i]));
@@ -213,6 +160,7 @@ static void ViewItems(string mediaType)
     Console.WriteLine("Score | Ranked Element");
     Console.WriteLine("----------------------");
 
+    string itemText;
     foreach (var kvp in sortedDict)
     {
         itemText = "";
@@ -227,21 +175,10 @@ static void ViewItems(string mediaType)
     Console.ReadKey();
 }
 
-static void RankItems(string mediaType, int k)
+static void RankItems(XmlInterface mediaXml, string mediaType, int k)
 {
-    // Load the items 
-    XmlDocument doc = new();
-    doc.Load($"../../../{mediaType}.xml");
-    List<XmlNode> items = [];
+    List<XmlNode> items = mediaXml.GetNonTemplateNodes();
 
-    XmlElement? root = doc.DocumentElement;
-    if (root == null) { return; }
-    foreach (XmlNode node in root.ChildNodes)
-    {
-        if (node.Name != "Template") { items.Add(node); }
-    }
-
-    // Rank the items
     Random random = new();
     while (true)
     {
@@ -277,7 +214,7 @@ static void RankItems(string mediaType, int k)
         SetElo(items[indexA], UpdateRating(eloA, actualScoreA, expectedScoreA, k));
         SetElo(items[indexB], UpdateRating(eloB, actualScoreB, expectedScoreB, k));
     }
-    doc.Save($"../../../{mediaType}.xml");
+    mediaXml.Refresh();
 }
 
 static int GetElo(XmlNode node)
